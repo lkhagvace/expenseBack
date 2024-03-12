@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
   })
 );
 
@@ -25,6 +25,7 @@ app.get("/check", verifyToken, (req, res) => {
   try {
     res.status(200).send("checking is working successfully ");
   } catch (error) {
+    console.error("error in check");
     res.status(403).send("Token Expired");
   }
 });
@@ -43,18 +44,16 @@ app.post("/signin", async (req, res) => {
         expiresIn: "10h",
       }
     );
-    const refreshToken = jwt.sign(
-      {
-        email: users[0].email,
-        id: users[0].id,
-        name: users[0].name,
-      },
-      process.env.SECRET_KEY
-    );
     return res.status(201).send({ token: accessToken });
   } catch (error) {
     console.error("error signin: ", error);
     res.status(400).json({ message: "failed in catch" });
+  }
+});
+app.get("/refreshToken", verifyToken, async (req, res) => {
+  try {
+  } catch (error) {
+    console.log("failed in refresh token", error);
   }
 });
 app.post("/signup", async (req, res) => {
@@ -79,7 +78,7 @@ app.get("/getUser", verifyToken, async (req, res) => {
     console.error("error: getU", error);
   }
 });
-app.get("/getBankBalance", async (req, res) => {
+app.get("/getBankBalance", verifyToken, async (req, res) => {
   try {
     const bankBalanceDatas = await sql`SELECT bankBalance, id FROM users`;
     res.status(202).send(bankBalanceDatas);

@@ -4,16 +4,15 @@ const secretKey = process.env.SECRET_KEY;
 
 const verifyToken = (req, res, next) => {
   try {
-    const refreshToken =
+    const accessToken =
       req.headers.authorization && req.headers.authorization.split(" ")[1];
-    if (!refreshToken) {
+    if (!accessToken) {
       res.status(401).json({ message: "unauthorized" });
     }
-    const decoded = jwt.verify(refreshToken, secretKey);
+    const decoded = jwt.verify(accessToken, secretKey);
     req.user = decoded;
     next();
   } catch (error) {
-    console.error("error: ", error);
     return res.status(403).json({ message: "invalid" });
   }
 };
